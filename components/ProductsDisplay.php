@@ -28,12 +28,24 @@ $sort = $_GET['sort'] ?? null;
 $classId = isset($_GET['class_id']) ? (int)$_GET['class_id'] : null;
 $typeId = isset($_GET['type_id']) ? (int)$_GET['type_id'] : null;
 
+// Počet produktů na stránku a offset pro stránkování
+$itemsPerPage = 50;
+$pageNumber = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($pageNumber - 1) * $itemsPerPage;
+
+
 // Výběr produktů podle hledání nebo obecně
 if ($searchTerm) {
-    $products = $productDB->searchProducts($searchTerm, $sort, $filterClassId, $classId, $typeId, $section);
+    $productsAll = $productDB->searchProducts($searchTerm, $sort, $filterClassId, $classId, $typeId, $section);
 } else {
-    $products = $productDB->getAllFull($sort, $filterClassId, $classId, $typeId, $section);
+    $productsAll = $productDB->getAllFull($sort, $filterClassId, $classId, $typeId, $section);
 }
+
+// Spočítej počet stránek a ořízni pole produktů podle aktuální stránky
+$totalProducts = count($productsAll);
+$numberOfPages = ceil($totalProducts / $itemsPerPage);
+$products = array_slice($productsAll, $offset, $itemsPerPage);
+
 ?>
 
 <!-- HTML část – obsahuje vyhledávání, řazení a výpis karet produktů -->
@@ -117,3 +129,14 @@ if ($searchTerm) {
         <?php endforeach; ?>
     </div>
 </div>
+<nav>
+    <ul class="pagination justify-content-center mt-4">
+    <?php for ($i = 1; $i <= $numberOfPages; $i++): ?>
+        <li class="page-item <?= ($i == $pageNumber) ? 'active' : '' ?>">
+            <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>">
+                <?= $i ?>
+            </a>
+        </li>
+    <?php endfor; ?>
+    </ul>
+</nav>

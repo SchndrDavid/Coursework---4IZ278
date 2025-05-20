@@ -93,5 +93,33 @@ class UsersDB extends Database {
         $stmt = $this->connection->prepare("UPDATE sp_users SET filter = ? WHERE user_id = ?");
         return $stmt->execute([$filter ? 1 : 0, $userId]);
     }
+
+    // Google OAuth – najde uživatele podle ID a poskytovatele
+    public function findByOAuth($provider, $oauthId) {
+    $sql = "SELECT * FROM {$this->tableName} WHERE oauth_provider = :provider AND oauth_id = :oauth_id";
+    $stmt = $this->connection->prepare($sql);
+    $stmt->execute([
+        ':provider' => $provider,
+        ':oauth_id' => $oauthId
+    ]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Vytvoří nového uživatele pomocí OAuth (Google)
+    public function createOAuth($args) {
+        $sql = "INSERT INTO {$this->tableName} (email, name, class_id, privilege_id, oauth_provider, oauth_id)
+                VALUES (:email, :name, :class_id, :privilege_id, :oauth_provider, :oauth_id)";
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute([
+            ':email' => $args['email'],
+            ':name' => $args['name'],
+            ':class_id' => $args['class_id'],
+            ':privilege_id' => $args['privilege_id'],
+            ':oauth_provider' => $args['oauth_provider'],
+            ':oauth_id' => $args['oauth_id'],
+        ]);
+    }
+
+
 }
 ?>

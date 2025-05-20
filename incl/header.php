@@ -6,7 +6,7 @@ session_start();
 $isLoggedIn = isset($_SESSION['user']);
 
 // Absolutní cesta k základnímu adresáři
-$base = '/www/schd22/sp/';
+$base = '/schd22/sp/';
 ?>
 
 <!DOCTYPE html>

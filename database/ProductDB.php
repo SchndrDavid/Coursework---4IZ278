@@ -153,5 +153,46 @@ class ProductDB extends Database {
         $stmt = $this->connection->prepare("DELETE FROM sp_products WHERE product_id = ?");
         $stmt->execute([$productId]);
     }
+
+    // Vrátí produkty pro danou stránku (bez kategorie)
+    public function findPaginated($limit, $offset) {
+        $stmt = $this->connection->prepare("
+            SELECT * FROM {$this->tableName} 
+            LIMIT :limit OFFSET :offset
+        ");
+        $stmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Vrátí počet všech produktů (pro stránkování bez filtru)
+    public function countProducts() {
+        $stmt = $this->connection->prepare("SELECT COUNT(*) FROM {$this->tableName}");
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    // Vrátí produkty podle kategorie pro danou stránku
+    public function findByCategoryPaginated($categoryId, $limit, $offset) {
+        $stmt = $this->connection->prepare("
+            SELECT * FROM {$this->tableName} 
+            WHERE class_id = :categoryId 
+            LIMIT :limit OFFSET :offset
+        ");
+        $stmt->bindValue(':categoryId', (int) $categoryId, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Vrátí počet produktů v dané kategorii
+    public function countByCategory($categoryId) {
+        $stmt = $this->connection->prepare("SELECT COUNT(*) FROM {$this->tableName} WHERE class_id = ?");
+        $stmt->execute([(int) $categoryId]);
+        return $stmt->fetchColumn();
+    }
+
 }
 ?>

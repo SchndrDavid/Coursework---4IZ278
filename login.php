@@ -68,6 +68,13 @@ if (!empty($_POST)) {
             <input name="password" id="password" type="password" class="form-control">
         </div>
         <button type="submit" class="btn btn-primary">Přihlásit se</button>
+        
+    <!-- Google prihlaseni -->
+        <hr class="my-4">
+            <a href="google_login.php" class="btn btn-danger">
+                Přihlásit se přes Google
+            </a>
+        </div>
     </form>
 </div>
 
